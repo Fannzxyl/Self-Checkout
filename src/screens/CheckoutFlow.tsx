@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Banknote, QrCode, ArrowLeft, CheckCircle, Receipt, Mail, ShoppingBag, LogOut, Check, Wifi, Lock, Loader2 } from 'lucide-react';
-// FIX PATH: Mundur 1 langkah (..)
 import { Button } from '../components/Shared';
+// FIX PATH: Cukup mundur 1 langkah (..) dari 'screens' ke 'src' untuk akses constants & types
 import { formatCurrency, CartItem, PaymentMethod } from '../types';
+import { TAX_RATE } from '../constants';
 
 // --- PAYMENT METHOD SCREEN ---
 export const PaymentMethodScreen: React.FC<{
@@ -383,7 +384,7 @@ export const ExitScreen: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 
     return (
         <div className="h-full flex flex-col items-center justify-center bg-yogya-red p-8 text-center text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <div className="absolute inset-0 bg-[url('[https://www.transparenttextures.com/patterns/cubes.png](https://www.transparenttextures.com/patterns/cubes.png)')] opacity-10"></div>
             
             <div className="z-10 animate-in zoom-in duration-500">
                 <h1 className="text-4xl font-extrabold mb-4">Terima Kasih</h1>

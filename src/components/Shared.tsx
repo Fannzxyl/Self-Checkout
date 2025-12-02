@@ -3,7 +3,7 @@ import { HelpCircle, AlertTriangle, X, ShoppingBag } from 'lucide-react';
 import { ScreenName } from '../types';
 
 // --- IMPORT DARI ASSETS ---
-// Mundur 1 langkah (..) dari folder 'components' ke 'src', lalu masuk 'assets'
+// Mundur 1 langkah (..) dari 'components' ke 'src', lalu masuk 'assets'
 import logoYogya from '../assets/Yogya_Group.png';
 
 // --- BUTTON COMPONENT ---

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Plus, Minus, Trash2, ArrowLeft, Scale, ShoppingCart, ScanLine, Wifi, WifiOff } from 'lucide-react';
 import { Button } from '../components/Shared';
-// FIX PATH: Cukup mundur 1 langkah (..) karena types & constants ada di src/
+// FIX PATH: Cukup mundur 1 langkah (..) dari 'screens' ke 'src' untuk akses constants & types
 import { MOCK_PRODUCTS, WEIGHT_PRODUCTS } from '../constants';
 import { Product, CartItem, formatCurrency } from '../types';
-// FIX PATH: Mundur 1 langkah (..) dari screens ke src, lalu masuk assets
-import logoYogya from '../assets/Yogya_Group.png';  
+// FIX PATH: Mundur 1 langkah (..) dari 'screens' ke 'src', lalu masuk 'assets'
+import logoYogya from '../assets/Yogya_Group.png';
 
 // --- WELCOME SCREEN ---
 export const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => (
