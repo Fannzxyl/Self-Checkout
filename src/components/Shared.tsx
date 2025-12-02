@@ -115,19 +115,19 @@ export const Layout: React.FC<LayoutProps> = ({ children, onRequestAssistance, s
         {!isHomeScreen && !isExitScreen && (
           <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0 z-10">
             
-            {/* --- LOGO + TEKS (DIPERBAIKI) --- */}
+            {/* --- LOGO + TEKS YOGYA SUPERMARKET --- */}
             <div className="flex items-center gap-2">
                 {/* Gambar Logo */}
                 <img 
                     src={logoYogya} 
                     alt="Yogya Group" 
-                    className="h-9 w-auto object-contain" 
+                    className="h-10 w-auto object-contain" 
                 />
                 
                 {/* Teks Nama Toko */}
                 <div className="flex flex-col justify-center">
-                    <span className="font-bold text-gray-800 text-sm leading-none">YOGYA</span>
-                    <span className="text-[10px] text-gray-500 font-medium tracking-wide">Supermarket</span>
+                    <span className="font-extrabold text-yogya-red text-base leading-none tracking-tight">YOGYA</span>
+                    <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase">Supermarket</span>
                 </div>
             </div>
             

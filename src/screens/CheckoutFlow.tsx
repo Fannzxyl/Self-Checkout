@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Banknote, QrCode, ArrowLeft, CheckCircle, Receipt, Mail, ShoppingBag, LogOut, Check, Wifi, Lock, Loader2 } from 'lucide-react';
+// FIX PATH: Mundur 1 langkah (..)
 import { Button } from '../components/Shared';
 import { formatCurrency, CartItem, PaymentMethod } from '../types';
 
