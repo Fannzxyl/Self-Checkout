@@ -5,7 +5,7 @@ import { Button } from '../components/Shared';
 import { MOCK_PRODUCTS, WEIGHT_PRODUCTS } from '../constants';
 import { Product, CartItem, formatCurrency } from '../types';
 // FIX PATH: Mundur 1 langkah (..) dari screens ke src, lalu masuk assets
-import logoYogya from '../assets/Yogya_Group.png';
+import logoYogya from '../assets/Yogya_Group.png';  
 
 // --- WELCOME SCREEN ---
 export const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => (
