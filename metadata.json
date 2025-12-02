@@ -1,0 +1,5 @@
+{
+  "name": "Yogya Center Self-Checkout",
+  "description": "A professional, retail-grade self-checkout UI simulation for Yogya Center featuring barcode scanning, weight station, and dynamic QRIS payment flows.",
+  "requestFramePermissions": []
+}
