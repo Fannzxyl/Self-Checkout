@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Layout, StaffModal } from './components/Shared';
 import { WelcomeScreen, ScanScreen, WeightScreen, CartScreen } from './components/screens/ShopFlow';
-import { PaymentMethodScreen, QRISScreen, SuccessScreen, ReceiptScreen, BaggingScreen, ExitScreen } from './components/screens/CheckoutFlow';
+import { PaymentMethodScreen, QRISScreen, SuccessScreen, ReceiptScreen, BaggingScreen, ExitScreen, CardPaymentScreen } from './components/screens/CheckoutFlow';
 import { ScreenName, CartItem, Product } from './types';
 import { TAX_RATE } from './constants';
 
@@ -54,11 +54,12 @@ const App: React.FC = () => {
   const handleCheckout = () => setCurrentScreen(ScreenName.PAYMENT_METHODS);
 
   const handlePaymentSelect = (method: string) => {
-    // For prototype, all methods go to QRIS/Simulated flow or direct success
     if (method === 'QRIS') {
         setCurrentScreen(ScreenName.QRIS);
+    } else if (method === 'CARD') {
+        setCurrentScreen(ScreenName.CARD_PAYMENT);
     } else {
-        // Simulate Card/Cash processing delay then success
+        // Cash still simulates delay for now or could have its own screen
         setTimeout(() => handlePaymentSuccess(), 2000);
     }
   };
@@ -115,6 +116,14 @@ const App: React.FC = () => {
       case ScreenName.QRIS:
         return (
             <QRISScreen 
+                total={total}
+                onSuccess={handlePaymentSuccess}
+                onCancel={() => setCurrentScreen(ScreenName.PAYMENT_METHODS)}
+            />
+        );
+      case ScreenName.CARD_PAYMENT:
+        return (
+            <CardPaymentScreen
                 total={total}
                 onSuccess={handlePaymentSuccess}
                 onCancel={() => setCurrentScreen(ScreenName.PAYMENT_METHODS)}

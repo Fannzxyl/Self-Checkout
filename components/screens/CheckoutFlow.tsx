@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Banknote, QrCode, ArrowLeft, CheckCircle, Receipt, Mail, ShoppingBag, LogOut, Check } from 'lucide-react';
+import { CreditCard, Banknote, QrCode, ArrowLeft, CheckCircle, Receipt, Mail, ShoppingBag, LogOut, Check, Wifi, Lock, Loader2 } from 'lucide-react';
 import { Button } from '../Shared';
 import { formatCurrency, CartItem, PaymentMethod } from '../../types';
 
@@ -70,6 +70,110 @@ export const PaymentMethodScreen: React.FC<{
         </div>
     </div>
   );
+};
+
+// --- CARD PAYMENT SCREEN ---
+export const CardPaymentScreen: React.FC<{
+    total: number;
+    onSuccess: () => void;
+    onCancel: () => void;
+}> = ({ total, onSuccess, onCancel }) => {
+    const [status, setStatus] = useState<'INSERT' | 'PROCESSING' | 'APPROVED'>('INSERT');
+
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout>;
+
+        if (status === 'INSERT') {
+            // Simulasi user memasukkan kartu setelah 3 detik
+            timer = setTimeout(() => {
+                setStatus('PROCESSING');
+            }, 3000);
+        } else if (status === 'PROCESSING') {
+            // Simulasi loading bank
+            timer = setTimeout(() => {
+                setStatus('APPROVED');
+            }, 2500);
+        } else if (status === 'APPROVED') {
+            // Pindah ke success screen
+            timer = setTimeout(() => {
+                onSuccess();
+            }, 1500);
+        }
+
+        return () => clearTimeout(timer);
+    }, [status, onSuccess]);
+
+    return (
+        <div className="h-full flex flex-col bg-white">
+            <div className="p-4 border-b border-gray-100 flex items-center gap-4">
+                {status === 'INSERT' && (
+                    <button onClick={onCancel} className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
+                        <ArrowLeft className="w-6 h-6" />
+                    </button>
+                )}
+                <h2 className="font-bold text-gray-900">Kartu Debit / Kredit</h2>
+            </div>
+
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+                {/* Visual Section */}
+                <div className="mb-10 relative">
+                    <div className="w-48 h-32 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-2xl relative overflow-hidden flex flex-col justify-between p-4 text-white z-10">
+                        <div className="flex justify-between items-start">
+                            <Wifi className="w-6 h-6 rotate-90 opacity-70" />
+                            <div className="font-bold italic opacity-50">BANK</div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-5 bg-yellow-500/80 rounded"></div>
+                            <div className="text-xs tracking-widest opacity-80">•••• •••• •••• 1234</div>
+                        </div>
+                    </div>
+                    
+                    {/* Reader Illustration */}
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-40 h-12 bg-gray-200 rounded-t-lg border-t-4 border-gray-300 z-0"></div>
+                    
+                    {/* Status Indicator on Reader */}
+                    <div className={`absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 h-1 rounded-full z-20 transition-colors duration-300 ${
+                        status === 'INSERT' ? 'bg-blue-400 animate-pulse' : 
+                        status === 'PROCESSING' ? 'bg-yellow-400' : 'bg-green-500'
+                    }`}></div>
+                </div>
+
+                {/* Status Text Section */}
+                <div className="space-y-4 max-w-xs mx-auto">
+                    {status === 'INSERT' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Silakan Masukkan Kartu</h3>
+                            <p className="text-gray-500 text-sm">Masukkan kartu ke slot di bawah atau tempel kartu pada mesin EDC.</p>
+                            <div className="mt-6 py-2 px-4 bg-gray-50 rounded-lg border border-gray-100 inline-block">
+                                <span className="text-yogya-red font-bold text-xl">{formatCurrency(total)}</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {status === 'PROCESSING' && (
+                        <div className="animate-in zoom-in duration-300">
+                            <Loader2 className="w-12 h-12 text-yogya-yellow animate-spin mx-auto mb-4" />
+                            <h3 className="text-xl font-bold text-gray-900 mb-1">Memproses...</h3>
+                            <p className="text-gray-500 text-sm">Jangan cabut kartu Anda</p>
+                            <div className="flex items-center justify-center gap-2 mt-4 text-xs text-gray-400">
+                                <Lock className="w-3 h-3" /> Koneksi Aman Terenkripsi
+                            </div>
+                        </div>
+                    )}
+
+                    {status === 'APPROVED' && (
+                        <div className="animate-in zoom-in duration-300">
+                            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Check className="w-8 h-8" />
+                            </div>
+                            <h3 className="text-xl font-bold text-green-600 mb-1">Disetujui</h3>
+                            <p className="text-gray-500 text-sm">Silakan ambil kartu Anda</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 };
 
 // --- QRIS SCREEN ---
