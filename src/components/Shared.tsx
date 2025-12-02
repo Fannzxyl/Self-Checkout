@@ -1,6 +1,10 @@
 import React from 'react';
-import { HelpCircle, AlertTriangle, X, ShoppingBag, LogOut } from 'lucide-react';
+import { HelpCircle, AlertTriangle, X, ShoppingBag } from 'lucide-react';
 import { ScreenName } from '../types';
+
+// --- IMPORT DARI ASSETS ---
+// Mundur 1 langkah (..) dari folder 'components' ke 'src', lalu masuk 'assets'
+import logoYogya from '../assets/Yogya_Group.png';
 
 // --- BUTTON COMPONENT ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -77,18 +81,10 @@ export const StaffModal: React.FC<StaffModalProps> = ({ isOpen, onClose }) => {
           </div>
           
           <div className="grid grid-cols-2 gap-2">
-             <div className="text-xs p-2 rounded bg-red-50 text-red-700 border border-red-100">
-                Gagal Scan
-             </div>
-             <div className="text-xs p-2 rounded bg-yellow-50 text-yellow-700 border border-yellow-100">
-                Verifikasi Usia
-             </div>
-             <div className="text-xs p-2 rounded bg-blue-50 text-blue-700 border border-blue-100">
-                Beda Berat
-             </div>
-             <div className="text-xs p-2 rounded bg-green-50 text-green-700 border border-green-100">
-                Pembayaran
-             </div>
+             <div className="text-xs p-2 rounded bg-red-50 text-red-700 border border-red-100">Gagal Scan</div>
+             <div className="text-xs p-2 rounded bg-yellow-50 text-yellow-700 border border-yellow-100">Verifikasi Usia</div>
+             <div className="text-xs p-2 rounded bg-blue-50 text-blue-700 border border-blue-100">Beda Berat</div>
+             <div className="text-xs p-2 rounded bg-green-50 text-green-700 border border-green-100">Pembayaran</div>
           </div>
         </div>
 
@@ -114,15 +110,25 @@ export const Layout: React.FC<LayoutProps> = ({ children, onRequestAssistance, s
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      {/* Mobile Frame Constraint */}
       <div className="w-full max-w-[480px] aspect-[9/16] bg-white rounded-[2rem] shadow-2xl overflow-hidden relative flex flex-col border-8 border-gray-900">
         
-        {/* Top Header */}
         {!isHomeScreen && !isExitScreen && (
           <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0 z-10">
+            
+            {/* --- LOGO + TEKS (DIPERBAIKI) --- */}
             <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-yogya-red rounded-lg flex items-center justify-center text-white font-bold text-xs">YC</div>
-                <span className="font-bold text-gray-800 tracking-tight">YOGYA<span className="font-light text-gray-500">Center</span></span>
+                {/* Gambar Logo */}
+                <img 
+                    src={logoYogya} 
+                    alt="Yogya Group" 
+                    className="h-9 w-auto object-contain" 
+                />
+                
+                {/* Teks Nama Toko */}
+                <div className="flex flex-col justify-center">
+                    <span className="font-bold text-gray-800 text-sm leading-none">YOGYA</span>
+                    <span className="text-[10px] text-gray-500 font-medium tracking-wide">Supermarket</span>
+                </div>
             </div>
             
             <div className="flex items-center gap-4">
@@ -143,12 +149,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, onRequestAssistance, s
           </header>
         )}
 
-        {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden relative bg-yogya-light">
             {children}
         </main>
 
-        {/* Version / Footer for Home */}
         {isHomeScreen && (
              <div className="absolute bottom-6 left-0 right-0 text-center">
                 <p className="text-gray-400 text-xs">v2.5.0 • Yogya Group Retail System</p>

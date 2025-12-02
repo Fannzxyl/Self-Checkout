@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Layout, StaffModal } from './components/Shared';
-import { WelcomeScreen, ScanScreen, WeightScreen, CartScreen } from './components/screens/ShopFlow';
-import { PaymentMethodScreen, QRISScreen, SuccessScreen, ReceiptScreen, BaggingScreen, ExitScreen, CardPaymentScreen } from './components/screens/CheckoutFlow';
+import { WelcomeScreen, WeightScreen, CartScreen } from './screens/ShopFlow';
+import { PaymentMethodScreen, QRISScreen, SuccessScreen, ReceiptScreen, BaggingScreen, ExitScreen, CardPaymentScreen } from './screens/CheckoutFlow';
 import { ScreenName, CartItem, Product } from './types';
 import { TAX_RATE } from './constants';
 
@@ -21,7 +21,8 @@ const App: React.FC = () => {
   const total = subtotal + tax;
 
   // Handlers
-  const handleStart = () => setCurrentScreen(ScreenName.SCAN);
+  // CHANGE 1: Start langsung ke CART, bukan SCAN
+  const handleStart = () => setCurrentScreen(ScreenName.CART);
   
   const handleScan = (product: Product) => {
     setCart(prev => {
@@ -35,7 +36,8 @@ const App: React.FC = () => {
 
   const handleAddWeightItem = (product: Product, weight: number) => {
     setCart(prev => [...prev, { ...product, qty: 1, weight }]);
-    setCurrentScreen(ScreenName.SCAN);
+    // CHANGE 2: Balik ke CART setelah nimbang
+    setCurrentScreen(ScreenName.CART);
   };
 
   const handleUpdateQty = (id: string, delta: number) => {
@@ -59,7 +61,6 @@ const App: React.FC = () => {
     } else if (method === 'CARD') {
         setCurrentScreen(ScreenName.CARD_PAYMENT);
     } else {
-        // Cash still simulates delay for now or could have its own screen
         setTimeout(() => handlePaymentSuccess(), 2000);
     }
   };
@@ -80,26 +81,23 @@ const App: React.FC = () => {
     switch (currentScreen) {
       case ScreenName.WELCOME:
         return <WelcomeScreen onStart={handleStart} />;
-      case ScreenName.SCAN:
-        return (
-            <ScanScreen 
-                onScan={handleScan} 
-                onGoToWeight={() => setCurrentScreen(ScreenName.WEIGHT)}
-                onGoToCart={() => setCurrentScreen(ScreenName.CART)}
-                cartTotal={total}
-                itemCount={cart.reduce((a, b) => a + b.qty, 0)}
-            />
-        );
+        
+      // CASE SCAN DIHAPUS
+
       case ScreenName.WEIGHT:
-        return <WeightScreen onAdd={handleAddWeightItem} onBack={() => setCurrentScreen(ScreenName.SCAN)} />;
+        // CHANGE 3: Back button arahkan ke CART
+        return <WeightScreen onAdd={handleAddWeightItem} onBack={() => setCurrentScreen(ScreenName.CART)} />;
+        
       case ScreenName.CART:
         return (
             <CartScreen 
                 cart={cart}
+                onScan={handleScan} // Pass fungsi scan kesini
+                onGoToWeight={() => setCurrentScreen(ScreenName.WEIGHT)} // Pass navigasi ke weight screen
                 onUpdateQty={handleUpdateQty}
                 onRemove={handleRemoveItem}
                 onCheckout={handleCheckout}
-                onBack={() => setCurrentScreen(ScreenName.SCAN)}
+                onBack={() => setCurrentScreen(ScreenName.WELCOME)}
                 subtotal={subtotal}
                 tax={tax}
                 total={total}
@@ -152,7 +150,19 @@ const App: React.FC = () => {
       case ScreenName.EXIT:
         return <ExitScreen onReset={handleReset} />;
       default:
-        return <div className="p-10 text-center">Screen Not Implemented</div>;
+        // Fallback kalau state nyangkut di SCAN (misal hot reload)
+        return <CartScreen 
+            cart={cart}
+            onScan={handleScan}
+            onGoToWeight={() => setCurrentScreen(ScreenName.WEIGHT)}
+            onUpdateQty={handleUpdateQty}
+            onRemove={handleRemoveItem}
+            onCheckout={handleCheckout}
+            onBack={() => setCurrentScreen(ScreenName.WELCOME)}
+            subtotal={subtotal}
+            tax={tax}
+            total={total}
+        />;
     }
   };
 
