@@ -162,6 +162,20 @@ export const CartScreen: React.FC<{
   
   const [barcodeBuffer, setBarcodeBuffer] = useState('');
   const [lastScannedName, setLastScannedName] = useState<string | null>(null);
+  
+  // STATE BARU: Cek status online/offline di dalam CartScreen
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    // Listener buat update state kalo internet mati/nyala
+    const handleStatusChange = () => setIsOnline(navigator.onLine);
+    window.addEventListener('online', handleStatusChange);
+    window.addEventListener('offline', handleStatusChange);
+    return () => {
+      window.removeEventListener('online', handleStatusChange);
+      window.removeEventListener('offline', handleStatusChange);
+    };
+  }, []);
 
   // FUNGSI: Simulasi Scan Random
   const handleSimulatedScan = () => {
@@ -322,14 +336,15 @@ export const CartScreen: React.FC<{
                     Timbang
                 </Button>
                 
+                {/* UPDATE: Tombol Bayar disabled kalau cart kosong ATAU offline */}
                 <Button 
                     variant="primary" 
                     size="lg" 
                     onClick={onCheckout} 
-                    disabled={cart.length === 0}
+                    disabled={cart.length === 0 || !isOnline}
                 >
-                    Bayar
-                    <ChevronRight className="w-5 h-5 ml-1" />
+                    {isOnline ? 'Bayar' : 'Offline'}
+                    {isOnline && <ChevronRight className="w-5 h-5 ml-1" />}
                 </Button>
             </div>
         </div>
