@@ -1,6 +1,22 @@
 // src/screens/CheckoutFlow.tsx
+
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Banknote, QrCode, ArrowLeft, CheckCircle, Receipt, Mail, ShoppingBag, LogOut, Check, Wifi, Lock, Loader2, XCircle, RefreshCw } from 'lucide-react';
+import { 
+    CreditCard, 
+    QrCode, 
+    ArrowLeft, 
+    CheckCircle, 
+    Receipt, 
+    Mail, 
+    ShoppingBag, 
+    LogOut, 
+    Check, 
+    Wifi, 
+    Lock, 
+    Loader2, 
+    XCircle, 
+    RefreshCw 
+} from 'lucide-react';
 import { Button } from '../components/Shared';
 import { formatCurrency, CartItem, PaymentMethod } from '../types';
 import { TAX_RATE } from '../constants';
@@ -32,6 +48,7 @@ export const PaymentMethodScreen: React.FC<{
             <h3 className="font-bold text-gray-900 mb-4 px-1">Pilih Metode Pembayaran</h3>
             
             <div className="space-y-3">
+                {/* QRIS BUTTON */}
                 <button 
                     onClick={() => onSelectMethod('QRIS')}
                     className="w-full bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-yogya-green hover:shadow-md transition-all flex items-center gap-4 group active:scale-[0.98]"
@@ -48,6 +65,7 @@ export const PaymentMethodScreen: React.FC<{
                     </div>
                 </button>
 
+                {/* CARD BUTTON */}
                 <button 
                     onClick={() => onSelectMethod('CARD')}
                     className="w-full bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-yogya-red hover:shadow-md transition-all flex items-center gap-4 group active:scale-[0.98]"
@@ -61,18 +79,7 @@ export const PaymentMethodScreen: React.FC<{
                     </div>
                 </button>
 
-                <button 
-                    onClick={() => onSelectMethod('CASH')}
-                    className="w-full bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-yogya-yellow hover:shadow-md transition-all flex items-center gap-4 group active:scale-[0.98]"
-                >
-                    <div className="p-3 bg-green-50 text-green-600 rounded-xl group-hover:bg-yogya-yellow group-hover:text-white transition-colors">
-                        <Banknote className="w-6 h-6" />
-                    </div>
-                    <div className="text-left flex-1">
-                        <p className="font-bold text-gray-800">Tunai</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Bayar di mesin tunai</p>
-                    </div>
-                </button>
+                {/* TUNAI REMOVED (CASHLESS ONLY) */}
             </div>
         </div>
     </div>
