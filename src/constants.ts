@@ -1,4 +1,4 @@
-import { Product } from './src/types';
+import { Product } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
   { id: '1', name: 'Indomie Goreng', price: 3500, image: 'https://picsum.photos/id/292/200/200', category: 'cpg' },

@@ -1,5 +1,17 @@
+// src/screens/ShopFlow.tsx
+
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Plus, Minus, Trash2, ArrowLeft, Scale, ShoppingCart, ScanLine, Zap } from 'lucide-react';
+import { 
+  ChevronRight, 
+  Plus, 
+  Minus, 
+  Trash2, 
+  ArrowLeft, 
+  Scale, 
+  ShoppingCart, 
+  ScanLine, 
+  Zap
+} from 'lucide-react';
 import { Button } from '../components/Shared';
 import { NetworkToast } from '../components/NetworkToast'; 
 import { MOCK_PRODUCTS, WEIGHT_PRODUCTS } from '../constants';
@@ -24,7 +36,6 @@ export const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) =>
             <img src={logoYogya} alt="Yogya Group" className="h-20 w-auto object-contain" />
         </div>
         
-        {/* EDIT: Ditambah 'mt-4' (turun dikit) dan 'ml-2' (geser kanan dikit) */}
         <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-3 mt-4 ml-2">
           Selamat Datang<br/>
           <span className="font-light text-2xl text-gray-500">YOGYA Supermarket</span>
@@ -164,7 +175,7 @@ export const CartScreen: React.FC<{
   const [barcodeBuffer, setBarcodeBuffer] = useState('');
   const [lastScannedName, setLastScannedName] = useState<string | null>(null);
   
-  // STATE BARU: Cek status online/offline
+  // STATE ONLINE/OFFLINE
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -220,8 +231,7 @@ export const CartScreen: React.FC<{
                 </div>
             </div>
             
-            {/* Bagian Kanan Header Kosong */}
-            <div className="w-10"></div>
+            {/* TOMBOL BANTUAN LOKAL SUDAH DIHAPUS (Karena sudah ada di Header Shared.tsx) */}
         </div>
 
         {/* Toast Notifikasi Scan */}
