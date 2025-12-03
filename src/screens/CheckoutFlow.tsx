@@ -78,8 +78,6 @@ export const PaymentMethodScreen: React.FC<{
                         <p className="text-xs text-gray-500 mt-0.5">Visa, Mastercard, GPN</p>
                     </div>
                 </button>
-
-                {/* TUNAI REMOVED (CASHLESS ONLY) */}
             </div>
         </div>
     </div>
@@ -298,7 +296,7 @@ export const QRISScreen: React.FC<{
     );
 };
 
-// --- SUCCESS SCREEN (MODERN RETAIL STYLE) ---
+// --- SUCCESS SCREEN (CLEAN STYLE) ---
 export const SuccessScreen: React.FC<{
     orderNumber: string;
     onViewReceipt: () => void;
@@ -306,9 +304,6 @@ export const SuccessScreen: React.FC<{
     return (
         <div className="h-full flex flex-col items-center justify-center bg-white p-8 text-center relative overflow-hidden">
             
-            {/* Background Decoration (Optional) */}
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yogya-red via-yogya-yellow to-yogya-green"></div>
-
             {/* Animated Success Icon */}
             <div className="relative mb-8 group">
                 <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-20 duration-1000"></div>
