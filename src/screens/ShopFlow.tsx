@@ -24,7 +24,8 @@ export const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) =>
             <img src={logoYogya} alt="Yogya Group" className="h-20 w-auto object-contain" />
         </div>
         
-        <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-3">
+        {/* EDIT: Ditambah 'mt-4' (turun dikit) dan 'ml-2' (geser kanan dikit) */}
+        <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-3 mt-4 ml-2">
           Selamat Datang<br/>
           <span className="font-light text-2xl text-gray-500">YOGYA Supermarket</span>
         </h1>
@@ -163,11 +164,10 @@ export const CartScreen: React.FC<{
   const [barcodeBuffer, setBarcodeBuffer] = useState('');
   const [lastScannedName, setLastScannedName] = useState<string | null>(null);
   
-  // STATE BARU: Cek status online/offline di dalam CartScreen
+  // STATE BARU: Cek status online/offline
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    // Listener buat update state kalo internet mati/nyala
     const handleStatusChange = () => setIsOnline(navigator.onLine);
     window.addEventListener('online', handleStatusChange);
     window.addEventListener('offline', handleStatusChange);
@@ -336,7 +336,7 @@ export const CartScreen: React.FC<{
                     Timbang
                 </Button>
                 
-                {/* UPDATE: Tombol Bayar disabled kalau cart kosong ATAU offline */}
+                {/* Tombol Bayar disabled kalau cart kosong ATAU offline */}
                 <Button 
                     variant="primary" 
                     size="lg" 
