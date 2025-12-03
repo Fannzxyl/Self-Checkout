@@ -1,27 +1,40 @@
+// src/App.tsx
+
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'; 
+// UPDATE: Import StaffModal juga
 import { Layout, StaffModal } from './components/Shared';
 import { WelcomeScreen, WeightScreen, CartScreen } from './screens/ShopFlow';
-import { PaymentMethodScreen, QRISScreen, SuccessScreen, ReceiptScreen, BaggingScreen, ExitScreen, CardPaymentScreen } from './screens/CheckoutFlow';
-import { ScreenName, CartItem, Product } from './types';
+import { 
+  PaymentMethodScreen, 
+  QRISScreen, 
+  CardPaymentScreen, 
+  SuccessScreen, 
+  ReceiptScreen, 
+  BaggingScreen, 
+  ExitScreen 
+} from './screens/CheckoutFlow';
+import { ScreenName, CartItem, Product, PaymentMethod } from './types';
 import { TAX_RATE } from './constants';
 
 const App: React.FC = () => {
-  // State
+  // --- STATE ---
   const [currentScreen, setCurrentScreen] = useState<ScreenName>(ScreenName.WELCOME);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [isStaffAssistanceRequested, setIsStaffAssistanceRequested] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
+  
+  // UPDATE: State untuk Modal Bantuan Global
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
-  // Derived State
+  // --- DERIVED STATE ---
   const subtotal = useMemo(() => {
     return cart.reduce((acc, item) => acc + (item.price * (item.weight || 1) * item.qty), 0);
   }, [cart]);
 
   const tax = subtotal * TAX_RATE;
-  const total = subtotal + tax;
+  const total = Math.round(subtotal + tax);
 
-  // Handlers
-  // CHANGE 1: Start langsung ke CART, bukan SCAN
+  // --- HANDLERS ---
   const handleStart = () => setCurrentScreen(ScreenName.CART);
   
   const handleScan = (product: Product) => {
@@ -35,18 +48,17 @@ const App: React.FC = () => {
   };
 
   const handleAddWeightItem = (product: Product, weight: number) => {
-    setCart(prev => [...prev, { ...product, qty: 1, weight }]);
-    // CHANGE 2: Balik ke CART setelah nimbang
+    setCart(prev => [...prev, { ...product, qty: 1, weight, isWeighted: true }]);
     setCurrentScreen(ScreenName.CART);
   };
 
   const handleUpdateQty = (id: string, delta: number) => {
     setCart(prev => prev.map(item => {
         if (item.id === id) {
-            return { ...item, qty: Math.max(1, item.qty + delta) };
+            return { ...item, qty: Math.max(0, item.qty + delta) };
         }
         return item;
-    }));
+    }).filter(item => item.qty > 0));
   };
 
   const handleRemoveItem = (id: string) => {
@@ -55,18 +67,13 @@ const App: React.FC = () => {
 
   const handleCheckout = () => setCurrentScreen(ScreenName.PAYMENT_METHODS);
 
-  const handlePaymentSelect = (method: string) => {
-    if (method === 'QRIS') {
-        setCurrentScreen(ScreenName.QRIS);
-    } else if (method === 'CARD') {
-        setCurrentScreen(ScreenName.CARD_PAYMENT);
-    } else {
-        setTimeout(() => handlePaymentSuccess(), 2000);
-    }
+  const handlePaymentSelect = (method: PaymentMethod) => {
+    if (method === 'QRIS') setCurrentScreen(ScreenName.QRIS);
+    else if (method === 'CARD') setCurrentScreen(ScreenName.CARD_PAYMENT);
   };
 
   const handlePaymentSuccess = () => {
-    setOrderNumber(`ORD-${Math.floor(Math.random() * 1000000)}`);
+    setOrderNumber(`ORD-${Math.floor(10000 + Math.random() * 90000)}`);
     setCurrentScreen(ScreenName.SUCCESS);
   };
 
@@ -76,24 +83,17 @@ const App: React.FC = () => {
     setCurrentScreen(ScreenName.WELCOME);
   };
 
-  // Render Logic
-  const renderScreen = () => {
+  // --- RENDER CONTENT ---
+  const renderContent = () => {
     switch (currentScreen) {
       case ScreenName.WELCOME:
         return <WelcomeScreen onStart={handleStart} />;
-        
-      // CASE SCAN DIHAPUS
-
-      case ScreenName.WEIGHT:
-        // CHANGE 3: Back button arahkan ke CART
-        return <WeightScreen onAdd={handleAddWeightItem} onBack={() => setCurrentScreen(ScreenName.CART)} />;
-        
       case ScreenName.CART:
         return (
             <CartScreen 
                 cart={cart}
-                onScan={handleScan} // Pass fungsi scan kesini
-                onGoToWeight={() => setCurrentScreen(ScreenName.WEIGHT)} // Pass navigasi ke weight screen
+                onScan={handleScan}
+                onGoToWeight={() => setCurrentScreen(ScreenName.WEIGHT)}
                 onUpdateQty={handleUpdateQty}
                 onRemove={handleRemoveItem}
                 onCheckout={handleCheckout}
@@ -103,6 +103,8 @@ const App: React.FC = () => {
                 total={total}
             />
         );
+      case ScreenName.WEIGHT:
+        return <WeightScreen onAdd={handleAddWeightItem} onBack={() => setCurrentScreen(ScreenName.CART)} />;
       case ScreenName.PAYMENT_METHODS:
         return (
             <PaymentMethodScreen 
@@ -150,32 +152,34 @@ const App: React.FC = () => {
       case ScreenName.EXIT:
         return <ExitScreen onReset={handleReset} />;
       default:
-        // Fallback kalau state nyangkut di SCAN (misal hot reload)
-        return <CartScreen 
-            cart={cart}
-            onScan={handleScan}
-            onGoToWeight={() => setCurrentScreen(ScreenName.WEIGHT)}
-            onUpdateQty={handleUpdateQty}
-            onRemove={handleRemoveItem}
-            onCheckout={handleCheckout}
-            onBack={() => setCurrentScreen(ScreenName.WELCOME)}
-            subtotal={subtotal}
-            tax={tax}
-            total={total}
-        />;
+        return null;
     }
   };
 
   return (
     <Layout 
-        onRequestAssistance={() => setIsStaffAssistanceRequested(true)} 
         screenName={currentScreen}
         cartCount={cart.reduce((a, b) => a + b.qty, 0)}
+        // UPDATE: Hubungkan tombol bantuan di Header ke State
+        onRequestAssistance={() => setIsHelpOpen(true)} 
     >
-      {renderScreen()}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentScreen}
+          className="h-full w-full"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {renderContent()}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* UPDATE: Render Modal Bantuan Global di sini */}
       <StaffModal 
-        isOpen={isStaffAssistanceRequested} 
-        onClose={() => setIsStaffAssistanceRequested(false)} 
+        isOpen={isHelpOpen} 
+        onClose={() => setIsHelpOpen(false)} 
       />
     </Layout>
   );

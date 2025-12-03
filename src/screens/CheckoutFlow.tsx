@@ -482,11 +482,11 @@ export const ExitScreen: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/20"></div>
             
             <div className="z-10 animate-in zoom-in duration-700 flex flex-col items-center">
-                 {/* UPDATE: Menggunakan Logo Lokal */}
+                 {/* UPDATE: Logo GEDE (h-28) */}
                  <img 
                     src={YogyaLogo} 
                     alt="Yogya Logo" 
-                    className="h-12 w-auto object-contain brightness-0 invert opacity-90 mb-8"
+                    className="h-28 w-auto object-contain brightness-0 invert opacity-90 mb-8"
                   />
                 <h1 className="text-3xl font-extrabold mb-4 tracking-tight">Terima Kasih</h1>
                 <p className="text-lg font-medium opacity-90 mb-10">Sampai jumpa kembali!</p>
