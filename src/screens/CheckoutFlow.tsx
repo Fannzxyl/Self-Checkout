@@ -7,7 +7,7 @@ import {
     ArrowLeft, 
     CheckCircle, 
     Receipt, 
-    Mail, 
+    // Mail removed here
     ShoppingBag, 
     LogOut, 
     Check, 
@@ -347,13 +347,7 @@ export const SuccessScreen: React.FC<{
                     <Receipt className="w-5 h-5" /> Lihat & Cetak Struk
                 </Button>
                 
-                <Button 
-                    fullWidth 
-                    variant="ghost" 
-                    className="text-gray-500 hover:text-gray-900 hover:bg-gray-50 border border-transparent hover:border-gray-200 transition-all"
-                >
-                    <Mail className="w-5 h-5 mr-2" /> Kirim Struk via Email
-                </Button>
+                {/* Tombol "Kirim Struk via Email" telah dihapus */}
             </div>
         </div>
     );
@@ -490,7 +484,6 @@ export const ExitScreen: React.FC<{ onReset: () => void }> = ({ onReset }) => {
                   />
                 <h1 className="text-3xl font-extrabold mb-4 tracking-tight">Terima Kasih</h1>
                 <p className="text-lg font-medium opacity-90 mb-10">Sampai jumpa kembali!</p>
-                <div className="w-16 h-1 bg-white/30 rounded-full mx-auto mb-20"></div>
             </div>
 
              <div className="absolute bottom-12 z-10 w-full px-10">
