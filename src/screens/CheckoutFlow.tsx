@@ -377,12 +377,12 @@ export const ReceiptScreen: React.FC<{
                     
                     <div className="p-6 pt-10">
                         <div className="text-center mb-8 pb-6 border-b border-gray-100">
-                             <div className="flex items-center justify-center gap-2 mb-2">
-                                {/* UPDATE: Menggunakan Logo Lokal */}
+                             {/* UPDATE: Logo diperbesar (h-20) dan margin bawah ditambah (mb-4) */}
+                             <div className="flex items-center justify-center gap-2 mb-4">
                                 <img 
                                 src={YogyaLogo} 
                                 alt="Yogya Logo" 
-                                className="h-8 w-auto object-contain grayscale opacity-70"
+                                className="h-20 w-auto object-contain grayscale opacity-80"
                                 />
                             </div>
                             <h2 className="font-bold text-lg text-gray-800">YOGYA Supermarket</h2>
