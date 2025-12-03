@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Plus, Minus, Trash2, ArrowLeft, Scale, ShoppingCart, ScanLine, Wifi, WifiOff } from 'lucide-react';
+import { ChevronRight, Plus, Minus, Trash2, ArrowLeft, Scale, ShoppingCart, ScanLine, Zap } from 'lucide-react';
 import { Button } from '../components/Shared';
-// FIX PATH: Cukup mundur 1 langkah (..) dari 'screens' ke 'src' untuk akses constants & types
+import { NetworkToast } from '../components/NetworkToast'; 
 import { MOCK_PRODUCTS, WEIGHT_PRODUCTS } from '../constants';
 import { Product, CartItem, formatCurrency } from '../types';
-// FIX PATH: Mundur 1 langkah (..) dari 'screens' ke 'src', lalu masuk 'assets'
 import logoYogya from '../assets/Yogya_Group.png';
 
 // --- WELCOME SCREEN ---
@@ -22,7 +21,7 @@ export const WelcomeScreen: React.FC<{ onStart: () => void }> = ({ onStart }) =>
     <div className="flex-1 px-8 pt-4 pb-12 flex flex-col justify-between">
       <div>
         <div className="mb-6">
-            <img src={logoYogya} alt="Yogya Group" className="h-16 w-auto object-contain" />
+            <img src={logoYogya} alt="Yogya Group" className="h-20 w-auto object-contain" />
         </div>
         
         <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-3">
@@ -163,29 +162,23 @@ export const CartScreen: React.FC<{
   
   const [barcodeBuffer, setBarcodeBuffer] = useState('');
   const [lastScannedName, setLastScannedName] = useState<string | null>(null);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
-  useEffect(() => {
-    const handleStatusChange = () => setIsOnline(navigator.onLine);
-    window.addEventListener('online', handleStatusChange);
-    window.addEventListener('offline', handleStatusChange);
-    return () => {
-      window.removeEventListener('online', handleStatusChange);
-      window.removeEventListener('offline', handleStatusChange);
-    };
-  }, []);
+  // FUNGSI: Simulasi Scan Random
+  const handleSimulatedScan = () => {
+    const randomProduct = MOCK_PRODUCTS[Math.floor(Math.random() * MOCK_PRODUCTS.length)];
+    if (randomProduct) {
+        onScan(randomProduct);
+        setLastScannedName(randomProduct.name);
+        setTimeout(() => setLastScannedName(null), 3000);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.ctrlKey || e.altKey || e.metaKey) return;
         if (e.key === 'Enter') {
             if (barcodeBuffer.length > 0) {
-                const demoProduct = MOCK_PRODUCTS[Math.floor(Math.random() * MOCK_PRODUCTS.length)];
-                if (demoProduct) {
-                    onScan(demoProduct);
-                    setLastScannedName(demoProduct.name);
-                    setTimeout(() => setLastScannedName(null), 3000);
-                }
+                handleSimulatedScan(); 
             }
             setBarcodeBuffer('');
         } else if (e.key.length === 1) {
@@ -198,56 +191,28 @@ export const CartScreen: React.FC<{
 
   return (
     <div className="h-full flex flex-col bg-gray-50 relative">
+        <NetworkToast />
+
         {/* Header */}
-        <div className="bg-white p-4 flex items-center justify-between border-b border-gray-200 shadow-sm z-10">
+        <div className="bg-white p-5 flex items-center justify-between border-b border-gray-200 shadow-sm z-10">
             <div className="flex items-center gap-3">
                 <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full text-gray-600">
                     <ArrowLeft className="w-6 h-6" />
                 </button>
 
                 <div className="flex flex-col">
-                    <h2 className="text-lg font-bold text-gray-900">Keranjang</h2>
-
-                    <div className="flex items-center gap-3 text-xs mt-1">
-                        <p className="text-green-600 flex items-center gap-1 font-medium bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                            <ScanLine className="w-3 h-3" /> Scanner Aktif
-                        </p>
-                        <span className="text-gray-300">|</span>
-                    </div>
-
-                    <div className={`flex items-center gap-1.5 font-bold px-2 py-0.5 rounded-full border transition-colors duration-300 mt-2 w-fit ${
-                        isOnline ? 'text-emerald-600 bg-emerald-50 border-emerald-100' : 'text-rose-600 bg-rose-50 border-rose-100'
-                    }`}>
-                        {isOnline ? (
-                            <>
-                                <div className="relative flex h-2 w-2">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </div>
-                                <span className="text-xs">Online</span>
-                            </>
-                        ) : (
-                            <>
-                                <WifiOff className="w-3 h-3" />
-                                <span className="text-xs">Offline</span>
-                            </>
-                        )}
-                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">Keranjang</h2>
+                    <p className="text-xs text-gray-400 font-medium">Order ID: #{Math.floor(Math.random() * 9000) + 1000}</p>
                 </div>
             </div>
             
-            <button 
-                onClick={onGoToWeight}
-                className="flex items-center gap-2 bg-orange-50 text-orange-700 px-3 py-2 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
-            >
-                <Scale className="w-5 h-5" />
-                <span className="text-sm font-bold">Barang Timbang</span>
-            </button>
+            {/* Bagian Kanan Header Kosong */}
+            <div className="w-10"></div>
         </div>
 
-        {/* Notifikasi Toast */}
+        {/* Toast Notifikasi Scan */}
         {lastScannedName && (
-            <div className="absolute top-32 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl z-50 animate-in slide-in-from-top-2 fade-in duration-300 flex items-center gap-2">
+            <div className="absolute top-32 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl z-50 animate-in slide-in-from-top-2 fade-in duration-300 flex items-center gap-2 pointer-events-none">
                 <div className="bg-green-500 rounded-full p-1">
                     <Plus className="w-3 h-3 text-white" />
                 </div>
@@ -255,60 +220,78 @@ export const CartScreen: React.FC<{
             </div>
         )}
 
-        {/* Empty State */}
-        {cart.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center opacity-60">
-                <ScanLine className="w-24 h-24 mb-4 text-gray-300" />
-                <h3 className="text-xl font-bold text-gray-500">Siap Memindai</h3>
-                <p className="text-sm mt-2 max-w-[200px]">Silakan scan barcode barang pada alat scanner...</p>
-                <p className="text-xs mt-8 bg-gray-200 px-2 py-1 rounded text-gray-500">Dev Note: Ketik keyboard & Enter untuk simulasi</p>
-            </div>
-        )}
+        {/* --- CONTENT AREA --- */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            
+            {/* Empty State */}
+            {cart.length === 0 && (
+                <div className="flex flex-col items-center justify-center h-full text-center opacity-60">
+                    <ScanLine className="w-24 h-24 mb-4 text-gray-300" />
+                    <h3 className="text-xl font-bold text-gray-500">Siap Memindai</h3>
+                    <p className="text-sm mt-2 max-w-[200px]">Tekan tombol simulasi di bawah untuk scan barang...</p>
+                </div>
+            )}
 
-        {/* List */}
-        {cart.length > 0 && (
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {cart.map((item) => (
-                    <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 animate-in slide-in-from-bottom-2 duration-300">
-                        <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-gray-50" />
-                        <div className="flex-1 min-w-0 flex flex-col justify-between">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="font-bold text-gray-800 text-sm truncate pr-2">{item.name}</h3>
-                                    {item.weight && (
-                                        <p className="text-xs text-gray-500 mt-0.5">{item.weight} kg @ {formatCurrency(item.price)}/kg</p>
+            {/* List Barang */}
+            {cart.length > 0 && (
+                <div className="space-y-3 pb-4">
+                     <div className="flex items-center gap-2 mb-2">
+                        <ShoppingCart className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">Daftar Belanjaan ({cart.reduce((a,b)=>a+b.qty,0)})</span>
+                     </div>
+
+                    {cart.map((item) => (
+                        <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 animate-in slide-in-from-bottom-2 duration-300">
+                            <img src={item.image} alt={item.name} className="w-16 h-16 rounded-lg object-cover bg-gray-50" />
+                            <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="font-bold text-gray-800 text-sm truncate pr-2">{item.name}</h3>
+                                        {item.weight && (
+                                            <p className="text-xs text-gray-500 mt-0.5">{item.weight} kg @ {formatCurrency(item.price)}/kg</p>
+                                        )}
+                                    </div>
+                                    <button onClick={() => onRemove(item.id)} className="text-gray-400 hover:text-red-500">
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                
+                                <div className="flex justify-between items-end mt-2">
+                                    <p className="font-bold text-yogya-red">{formatCurrency(item.price * (item.weight || 1) * item.qty)}</p>
+                                    
+                                    {!item.isWeighted && (
+                                        <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-2 py-1 border border-gray-200">
+                                            <button onClick={() => onUpdateQty(item.id, -1)} className="p-1 hover:bg-white rounded shadow-sm disabled:opacity-30" disabled={item.qty <= 1}>
+                                                <Minus className="w-3 h-3 text-gray-700" />
+                                            </button>
+                                            <span className="text-sm font-bold text-gray-900 w-4 text-center">{item.qty}</span>
+                                            <button onClick={() => onUpdateQty(item.id, 1)} className="p-1 hover:bg-white rounded shadow-sm">
+                                                <Plus className="w-3 h-3 text-gray-700" />
+                                            </button>
+                                        </div>
+                                    )}
+                                    {item.isWeighted && (
+                                        <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                            {item.weight}kg x {item.qty}
+                                        </span>
                                     )}
                                 </div>
-                                <button onClick={() => onRemove(item.id)} className="text-gray-400 hover:text-red-500">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                            
-                            <div className="flex justify-between items-end mt-2">
-                                <p className="font-bold text-yogya-red">{formatCurrency(item.price * (item.weight || 1) * item.qty)}</p>
-                                
-                                {!item.isWeighted && (
-                                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-2 py-1 border border-gray-200">
-                                        <button onClick={() => onUpdateQty(item.id, -1)} className="p-1 hover:bg-white rounded shadow-sm disabled:opacity-30" disabled={item.qty <= 1}>
-                                            <Minus className="w-3 h-3 text-gray-700" />
-                                        </button>
-                                        <span className="text-sm font-bold text-gray-900 w-4 text-center">{item.qty}</span>
-                                        <button onClick={() => onUpdateQty(item.id, 1)} className="p-1 hover:bg-white rounded shadow-sm">
-                                            <Plus className="w-3 h-3 text-gray-700" />
-                                        </button>
-                                    </div>
-                                )}
-                                {item.isWeighted && (
-                                    <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                        {item.weight}kg x {item.qty}
-                                    </span>
-                                )}
                             </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-        )}
+                    ))}
+                </div>
+            )}
+        </div>
+
+        {/* --- BUTTON SIMULASI SCAN (DI ATAS FOOTER) --- */}
+        <div className="px-6 pb-2 z-20">
+            <button 
+                onClick={handleSimulatedScan}
+                className="w-full bg-gray-900 text-white py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all"
+            >
+                <span className="font-bold text-sm">Simulasi Scan Barang</span>
+            </button>
+        </div>
 
         {/* Summary Footer */}
         <div className="bg-white p-6 rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.05)] border-t border-gray-100 z-20">
@@ -327,9 +310,28 @@ export const CartScreen: React.FC<{
                 </div>
             </div>
 
-            <Button fullWidth size="lg" onClick={onCheckout} disabled={cart.length === 0 || !isOnline}>
-                {isOnline ? 'Lanjut Pembayaran' : 'Offline - Cek Koneksi'}
-            </Button>
+            {/* BUTTON GROUP FOOTER */}
+            <div className="grid grid-cols-2 gap-3">
+                <Button 
+                    variant="outline" 
+                    size="lg" 
+                    onClick={onGoToWeight}
+                    className="border-2 border-yogya-yellow/50 text-yellow-700 bg-yellow-50 hover:bg-yellow-100 hover:border-yogya-yellow"
+                >
+                    <Scale className="w-5 h-5 mr-1" />
+                    Timbang
+                </Button>
+                
+                <Button 
+                    variant="primary" 
+                    size="lg" 
+                    onClick={onCheckout} 
+                    disabled={cart.length === 0}
+                >
+                    Bayar
+                    <ChevronRight className="w-5 h-5 ml-1" />
+                </Button>
+            </div>
         </div>
     </div>
   );
