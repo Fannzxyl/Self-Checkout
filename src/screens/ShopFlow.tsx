@@ -166,8 +166,7 @@ export const CartScreen: React.FC<{
   const [tempScannedProduct, setTempScannedProduct] = useState<Product | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   
-  // STATE UNTUK TIMER (PROGRES BAR JEDA)
-  const [autoScanProgress, setAutoScanProgress] = useState(0);
+  // NOTE: State autoScanProgress DIHAPUS karena garis loading dihilangkan
 
   useEffect(() => {
     const handleStatusChange = () => setIsOnline(navigator.onLine);
@@ -187,32 +186,24 @@ export const CartScreen: React.FC<{
     const randomProduct = MOCK_PRODUCTS[Math.floor(Math.random() * MOCK_PRODUCTS.length)];
     if (randomProduct) {
         setTempScannedProduct(randomProduct);
-        setAutoScanProgress(0); // Reset progress
     }
   };
 
-  // LOGIK BARU: AUTO ADD DENGAN JEDA 2 DETIK
+  // LOGIK BARU: AUTO ADD LEBIH CEPAT TANPA LOADING BAR
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    let progressTimer: NodeJS.Timeout;
 
     if (tempScannedProduct) {
-        // 1. Jalankan Timer buat animasi loading bar (biar smooth 0-100%)
-        progressTimer = setInterval(() => {
-            setAutoScanProgress((prev) => Math.min(prev + 5, 100)); // Nambah 5% tiap 100ms = 2 detik total
-        }, 100);
-
-        // 2. Jalankan Timer buat masukin keranjang setelah 2 detik
+        // Langsung set timer 1 detik (1000ms) buat pop-up, habis itu langsung masuk
+        // Durasi 1 detik biar user sempet liat "oh barang ini yg discan"
         timer = setTimeout(() => {
             onScan(tempScannedProduct); // Masukin keranjang
             setTempScannedProduct(null); // Tutup pop-up
-            setAutoScanProgress(0);
-        }, 2000);
+        }, 1000); // <-- Dipercepat jadi 1 detik biar sat-set
     }
 
     return () => {
         clearTimeout(timer);
-        clearInterval(progressTimer);
     };
   }, [tempScannedProduct, onScan]);
 
@@ -231,7 +222,7 @@ export const CartScreen: React.FC<{
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [barcodeBuffer, tempScannedProduct]); // Tambah dependency biar gak double scan
+  }, [barcodeBuffer, tempScannedProduct]);
 
   return (
     <div className="h-full flex flex-col bg-gray-50 relative">
@@ -252,14 +243,14 @@ export const CartScreen: React.FC<{
             <div className="w-10"></div>
         </div>
 
-        {/* --- POP-UP AUTO SCAN (TANPA TOMBOL) --- */}
+        {/* --- POP-UP AUTO SCAN (CLEAN TANPA LOADING BAR) --- */}
         {tempScannedProduct && (
             <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                 <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative animate-in zoom-in-95 duration-200 flex flex-col items-center">
                     
-                    {/* Visual Loading / Spinner */}
+                    {/* Spinner kecil di pojok sebagai tanda proses (opsional, bisa dihapus kalau mau clean banget) */}
                     <div className="absolute top-4 right-4">
-                        <Loader2 className="w-6 h-6 text-gray-300 animate-spin" />
+                        <Loader2 className="w-5 h-5 text-gray-300 animate-spin" />
                     </div>
 
                     <div className="w-48 h-48 mb-6 relative">
@@ -274,18 +265,16 @@ export const CartScreen: React.FC<{
                     <h3 className="text-2xl font-extrabold text-gray-900 mb-2 leading-tight text-center">
                         {tempScannedProduct.name}
                     </h3>
-                    <p className="text-2xl font-bold text-yogya-red mb-8">
+                    <p className="text-2xl font-bold text-yogya-red mb-2">
                         {formatCurrency(tempScannedProduct.price)}
                     </p>
 
-                    {/* Loading Bar Otomatis */}
-                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-2">
-                        <div 
-                            className="bg-yogya-green h-full transition-all duration-100 ease-linear"
-                            style={{ width: `${autoScanProgress}%` }}
-                        ></div>
-                    </div>
-                    <p className="text-xs text-gray-400 font-medium">Memasukkan ke keranjang...</p>
+                    {/* LOADING BAR DIHAPUS DI SINI */}
+                    
+                    {/* Ganti teks status jadi lebih simpel */}
+                    <p className="text-xs text-gray-400 font-medium mt-4 bg-gray-100 px-3 py-1 rounded-full flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Berhasil dipindai
+                    </p>
                 </div>
             </div>
         )}
