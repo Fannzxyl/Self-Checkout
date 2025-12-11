@@ -1,11 +1,11 @@
 import { Product } from './types';
 
 export const MOCK_PRODUCTS: Product[] = [
-  { id: '1', name: 'Indomie Goreng', price: 3500, image: 'https://picsum.photos/id/292/200/200', category: 'cpg' },
-  { id: '2', name: 'Ultra Milk Coklat 1L', price: 18900, image: 'https://picsum.photos/id/225/200/200', category: 'cpg' },
-  { id: '3', name: 'Roti Tawar Kupas', price: 14500, image: 'https://picsum.photos/id/431/200/200', category: 'cpg' },
-  { id: '4', name: 'Kecap Manis Bango', price: 24000, image: 'https://picsum.photos/id/63/200/200', category: 'cpg' },
-  { id: '5', name: 'Minyak Goreng 2L', price: 38000, image: 'https://picsum.photos/id/75/200/200', category: 'cpg' },
+  { id: '1', name: 'Indomie Goreng', price: 3500, image: 'https://yoline.co.id/media/products/ProductIndomie_goreng_special_jumbo_129gr.png', category: 'cpg' },
+  { id: '2', name: 'Ultra Milk Coklat 1L', price: 18900, image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBk2t41EbtGcKgOgYjz81YIivR_rB0FbZh4A&s', category: 'cpg' },
+  { id: '3', name: 'Roti Tawar Kupas', price: 14500, image: 'https://down-id.img.susercontent.com/file/id-11134207-7qukz-lgt7at9bb9dvda', category: 'cpg' },
+  { id: '4', name: 'Kecap Manis Bango', price: 24000, image: 'https://image.astronauts.cloud/product-images/2024/10/OCT2_a4345a85-42d0-473d-ab86-ef25a0893cbb_900x900.jpg', category: 'cpg' },
+  { id: '5', name: 'Minyak Goreng 2L', price: 38000, image: 'https://c.alfagift.id/product/1/1_A09350001880_20211116135938878_base.jpg', category: 'cpg' },
 ];
 
 export const WEIGHT_PRODUCTS: Product[] = [

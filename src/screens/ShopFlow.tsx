@@ -1,17 +1,5 @@
-// src/screens/ShopFlow.tsx
-
 import React, { useState, useEffect } from 'react';
-import { 
-  ChevronRight, 
-  Plus, 
-  Minus, 
-  Trash2, 
-  ArrowLeft, 
-  Scale, 
-  ShoppingCart, 
-  ScanLine, 
-  Zap
-} from 'lucide-react';
+import { ChevronRight, Trash2, ArrowLeft, Scale, ShoppingCart, ScanLine, Zap, Loader2, Plus, Minus, Check } from 'lucide-react';
 import { Button } from '../components/Shared';
 import { NetworkToast } from '../components/NetworkToast'; 
 import { MOCK_PRODUCTS, WEIGHT_PRODUCTS } from '../constants';
@@ -173,10 +161,13 @@ export const CartScreen: React.FC<{
 }> = ({ cart, onScan, onGoToWeight, onUpdateQty, onRemove, onCheckout, onBack, subtotal, tax, total }) => {
   
   const [barcodeBuffer, setBarcodeBuffer] = useState('');
-  const [lastScannedName, setLastScannedName] = useState<string | null>(null);
   
-  // STATE ONLINE/OFFLINE
+  // STATE BARU: Menyimpan barang sementara hasil scan (sebelum masuk keranjang)
+  const [tempScannedProduct, setTempScannedProduct] = useState<Product | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  
+  // STATE UNTUK TIMER (PROGRES BAR JEDA)
+  const [autoScanProgress, setAutoScanProgress] = useState(0);
 
   useEffect(() => {
     const handleStatusChange = () => setIsOnline(navigator.onLine);
@@ -188,15 +179,43 @@ export const CartScreen: React.FC<{
     };
   }, []);
 
-  // FUNGSI: Simulasi Scan Random
+  // FUNGSI 1: Handle Simulasi Scan -> Buka Pop-up
   const handleSimulatedScan = () => {
+    // Kalau sedang menampilkan pop-up, jangan scan dulu (prevent spam)
+    if (tempScannedProduct) return;
+
     const randomProduct = MOCK_PRODUCTS[Math.floor(Math.random() * MOCK_PRODUCTS.length)];
     if (randomProduct) {
-        onScan(randomProduct);
-        setLastScannedName(randomProduct.name);
-        setTimeout(() => setLastScannedName(null), 3000);
+        setTempScannedProduct(randomProduct);
+        setAutoScanProgress(0); // Reset progress
     }
   };
+
+  // LOGIK BARU: AUTO ADD DENGAN JEDA 2 DETIK
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    let progressTimer: NodeJS.Timeout;
+
+    if (tempScannedProduct) {
+        // 1. Jalankan Timer buat animasi loading bar (biar smooth 0-100%)
+        progressTimer = setInterval(() => {
+            setAutoScanProgress((prev) => Math.min(prev + 5, 100)); // Nambah 5% tiap 100ms = 2 detik total
+        }, 100);
+
+        // 2. Jalankan Timer buat masukin keranjang setelah 2 detik
+        timer = setTimeout(() => {
+            onScan(tempScannedProduct); // Masukin keranjang
+            setTempScannedProduct(null); // Tutup pop-up
+            setAutoScanProgress(0);
+        }, 2000);
+    }
+
+    return () => {
+        clearTimeout(timer);
+        clearInterval(progressTimer);
+    };
+  }, [tempScannedProduct, onScan]);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -212,7 +231,7 @@ export const CartScreen: React.FC<{
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [barcodeBuffer, onScan]);
+  }, [barcodeBuffer, tempScannedProduct]); // Tambah dependency biar gak double scan
 
   return (
     <div className="h-full flex flex-col bg-gray-50 relative">
@@ -230,17 +249,44 @@ export const CartScreen: React.FC<{
                     <p className="text-xs text-gray-400 font-medium">Order ID: #{Math.floor(Math.random() * 9000) + 1000}</p>
                 </div>
             </div>
-            
-            {/* TOMBOL BANTUAN LOKAL SUDAH DIHAPUS (Karena sudah ada di Header Shared.tsx) */}
+            <div className="w-10"></div>
         </div>
 
-        {/* Toast Notifikasi Scan */}
-        {lastScannedName && (
-            <div className="absolute top-32 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl z-50 animate-in slide-in-from-top-2 fade-in duration-300 flex items-center gap-2 pointer-events-none">
-                <div className="bg-green-500 rounded-full p-1">
-                    <Plus className="w-3 h-3 text-white" />
+        {/* --- POP-UP AUTO SCAN (TANPA TOMBOL) --- */}
+        {tempScannedProduct && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl relative animate-in zoom-in-95 duration-200 flex flex-col items-center">
+                    
+                    {/* Visual Loading / Spinner */}
+                    <div className="absolute top-4 right-4">
+                        <Loader2 className="w-6 h-6 text-gray-300 animate-spin" />
+                    </div>
+
+                    <div className="w-48 h-48 mb-6 relative">
+                             <div className="absolute inset-0 bg-yogya-red/10 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+                             <img 
+                                src={tempScannedProduct.image} 
+                                alt={tempScannedProduct.name} 
+                                className="w-full h-full object-contain relative z-10 drop-shadow-xl"
+                             />
+                    </div>
+                        
+                    <h3 className="text-2xl font-extrabold text-gray-900 mb-2 leading-tight text-center">
+                        {tempScannedProduct.name}
+                    </h3>
+                    <p className="text-2xl font-bold text-yogya-red mb-8">
+                        {formatCurrency(tempScannedProduct.price)}
+                    </p>
+
+                    {/* Loading Bar Otomatis */}
+                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mb-2">
+                        <div 
+                            className="bg-yogya-green h-full transition-all duration-100 ease-linear"
+                            style={{ width: `${autoScanProgress}%` }}
+                        ></div>
+                    </div>
+                    <p className="text-xs text-gray-400 font-medium">Memasukkan ke keranjang...</p>
                 </div>
-                <span className="font-medium text-sm">Berhasil menambah: <b>{lastScannedName}</b></span>
             </div>
         )}
 
@@ -283,15 +329,11 @@ export const CartScreen: React.FC<{
                                 <div className="flex justify-between items-end mt-2">
                                     <p className="font-bold text-yogya-red">{formatCurrency(item.price * (item.weight || 1) * item.qty)}</p>
                                     
+                                    {/* Tampilan Qty Statis (Tanpa Tombol +/-) */}
                                     {!item.isWeighted && (
-                                        <div className="flex items-center gap-3 bg-gray-50 rounded-lg px-2 py-1 border border-gray-200">
-                                            <button onClick={() => onUpdateQty(item.id, -1)} className="p-1 hover:bg-white rounded shadow-sm disabled:opacity-30" disabled={item.qty <= 1}>
-                                                <Minus className="w-3 h-3 text-gray-700" />
-                                            </button>
-                                            <span className="text-sm font-bold text-gray-900 w-4 text-center">{item.qty}</span>
-                                            <button onClick={() => onUpdateQty(item.id, 1)} className="p-1 hover:bg-white rounded shadow-sm">
-                                                <Plus className="w-3 h-3 text-gray-700" />
-                                            </button>
+                                        <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-1.5 border border-gray-200">
+                                            <span className="text-xs text-gray-500 font-medium">Qty:</span>
+                                            <span className="text-sm font-bold text-gray-900">{item.qty}</span>
                                         </div>
                                     )}
                                     {item.isWeighted && (
@@ -311,9 +353,18 @@ export const CartScreen: React.FC<{
         <div className="px-6 pb-2 z-20">
             <button 
                 onClick={handleSimulatedScan}
-                className="w-full bg-gray-900 text-white py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all"
+                // Tombol disable saat lagi proses scanning biar gak spam
+                disabled={!!tempScannedProduct} 
+                className="w-full bg-gray-900 text-white py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-                <span className="font-bold text-sm">Simulasi Scan Barang</span>
+                {tempScannedProduct ? (
+                     <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                    <Zap className="w-5 h-5 text-yellow-400" />
+                )}
+                <span className="font-bold text-sm">
+                    {tempScannedProduct ? 'Sedang Memindai...' : 'Simulasi Scan Barang'}
+                </span>
             </button>
         </div>
 
