@@ -357,11 +357,10 @@ export const CartScreen: React.FC<{
                 disabled={!!tempScannedProduct} 
                 className="w-full bg-gray-900 text-white py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800 active:scale-95 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-                {tempScannedProduct ? (
-                     <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                    <Zap className="w-5 h-5 text-yellow-400" />
+                {tempScannedProduct && (
+                    <Loader2 className="w-5 h-5 animate-spin" />
                 )}
+                
                 <span className="font-bold text-sm">
                     {tempScannedProduct ? 'Sedang Memindai...' : 'Simulasi Scan Barang'}
                 </span>
